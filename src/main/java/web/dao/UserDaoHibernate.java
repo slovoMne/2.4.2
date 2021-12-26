@@ -19,7 +19,7 @@ public class UserDaoHibernate implements UserDao{
 
     @Override
     public User findByUsername(String username) {
-        return entityManager.createQuery("FROM User u WHERE u.username = :username", User.class)
+        return entityManager.createQuery("FROM User u JOIN FETCH u.roles WHERE u.username = :username", User.class)
                 .setParameter("username", username).getSingleResult();
     }
 
@@ -36,17 +36,20 @@ public class UserDaoHibernate implements UserDao{
 
     @Override
     public List<User> getAllUsers() {
-        return entityManager.createQuery("FROM User", User.class).getResultList();
+        return entityManager.createQuery("FROM User u JOIN FETCH u.roles", User.class).getResultList();
     }
 
     @Override
     public User getUserById(long id) {
-        return entityManager.find(User.class, id);
+//        return entityManager.find(User.class, id);
+        return (User) entityManager.createQuery("SELECT u FROM User u JOIN FETCH u.roles where u.id = :id")
+                .setParameter("id", id)
+                .getSingleResult();
     }
 
     @Override
     public User showUser(long id) {
-        return entityManager.find(User.class, id);
+        return null;
     }
 
     @Override
